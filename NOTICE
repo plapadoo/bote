@@ -1,0 +1,54 @@
+Logback
+=======
+Logback: the reliable, generic, fast and flexible logging framework.
+Copyright (C) 1999-2017, QOS.ch. All rights reserved.
+
+This program and the accompanying materials are dual-licensed under
+either the terms of the Eclipse Public License v1.0 as published by
+the Eclipse Foundation
+
+  or (per the licensee's choosing)
+
+under the terms of the GNU Lesser General Public License version 2.1
+as published by the Free Software Foundation.
+
+RxJava
+======
+Copyright (c) 2016-present, RxJava Contributors.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
+
+Javassist
+=========
+Java bytecode engineering toolkit
+
+Javassist version 3
+
+Copyright (C) 1999- by Shigeru Chiba, All rights reserved.
+
+Javassist (JAVA programming ASSISTant) makes Java bytecode manipulation simple. It is a class library for editing bytecodes in Java; it enables Java programs to define a new class at runtime and to modify a class file when the JVM loads it. Unlike other similar bytecode editors, Javassist provides two levels of API: source level and bytecode level. If the users use the source- level API, they can edit a class file without knowledge of the specifications of the Java bytecode. The whole API is designed with only the vocabulary of the Java language. You can even specify inserted bytecode in the form of source text; Javassist compiles it on the fly. On the other hand, the bytecode-level API allows the users to directly edit a class file as other editors.
+
+This software is distributed under the Mozilla Public License Version 1.1, the GNU Lesser General Public License Version 2.1 or later, or the Apache License Version 2.0.
+
+
+JOOQ
+====
+Copyright (c) 2009-2016, Data Geekery GmbH (http://www.datageekery.com)
+All rights reserved.
+
+Kotlin
+======
+Kotlin Compiler
+Copyright 2010-2015 JetBrains s.r.o and respective authors and developers
+
+Zentus
+======
+This product includes the following softwares developed by David Crawshaw.
+See LICENSE-zentus file.
+
+And also, NestedVM (Apache License Version 2.0) is used inside sqlite-

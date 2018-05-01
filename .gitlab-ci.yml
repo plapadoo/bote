@@ -1,0 +1,22 @@
+compile:
+  stage: build
+  script:
+    - ci/build.sh
+  artifacts:
+    paths:
+      - target/*.jar
+
+run-test:
+  stage: test
+  script:
+    - ci/test.sh
+
+deploy-staging:
+  stage: deploy
+  environment:
+    name: staging
+    url: https://bote.plapadoo.de
+  only:
+    - master
+  script:
+    - ci/deploy-staging.sh
