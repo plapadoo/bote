@@ -1,7 +1,11 @@
 package de.plapadoo.bote.util
 
 import de.plapadoo.bote.ApplicationConfiguration
+import java.util.*
 import java.util.regex.Pattern
+import javax.mail.*
+import javax.mail.internet.InternetAddress
+import javax.mail.internet.MimeMessage
 
 class MailUtil {
 	companion object {
@@ -12,7 +16,22 @@ class MailUtil {
 		}
 
 		fun sendConfirmationLink(subscriber: String, token: String, config: ApplicationConfiguration) {
-			// TODO
+			val props = Properties()
+			props.put("mail.smtp.host", "localhost")
+			props.put("mail.smtp.port", "9000")
+			val session = Session.getInstance(props, null)
+
+			try {
+				val msg = MimeMessage(session)
+				msg.setFrom(InternetAddress("bote@monica-software.de"))
+				msg.setRecipients(Message.RecipientType.TO, subscriber)
+				msg.setSubject("[Monica] Ihre Newsletteranmeldung")
+				msg.setSentDate(Date())
+				msg.setText("Dein token: $token")
+				Transport.send(msg)
+			} catch (mex: MessagingException) {
+				println("send failed, exception: $mex")
+			}
 		}
 	}
 }
