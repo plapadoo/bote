@@ -39,11 +39,6 @@
 				<version>1.7.25</version>
 			</dependency>
 			<dependency>
-				<groupId>net.winterly.rxjersey</groupId>
-				<artifactId>rxjava2-server</artifactId>
-				<version>0.10.1</version>
-			</dependency>
-			<dependency>
 				<groupId>io.reactivex.rxjava2</groupId>
 				<artifactId>rxjava</artifactId>
 				<version>2.1.13</version>
@@ -100,10 +95,6 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>jul-to-slf4j</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>net.winterly.rxjersey</groupId>
-			<artifactId>rxjava2-server</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.reactivex.rxjava2</groupId>
