@@ -20,7 +20,7 @@ import java.util.logging.LogManager
 /**
  * Starts the jetty server to serve the ReST API.
 
- * @param args Should contain one String with the path/to/the/configuraion.properties.
+ * @param args Should contain one String with the path/to/the/configuration.properties.
  * *
  * @throws Exception If the jetty server cannot be started.
  */
@@ -74,7 +74,7 @@ fun main(args: Array<String>) {
 }
 
 private fun initializeLogging(rc: ResourceConfig, config: ApplicationConfiguration) {
-	//We prefer to set the logback config programatically and specify the path in the application configuration.
+	//We prefer to set the logback config programmatically and specify the path in the application configuration.
 	System.setProperty("logback.configurationFile", config.logConfigPath.toString())
 	LogManager.getLogManager().reset()
 	SLF4JBridgeHandler.removeHandlersForRootLogger()
