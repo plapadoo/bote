@@ -78,16 +78,12 @@ constructor(path: Path) {
 	val subscribeAlreadySubscribedUrl: String
 		get() = this.properties.getProperty(KEY_SUBSCRIBE_ALREADY_SUBSCRIBED_URL)
 
-	val path: String
-		get() = this.properties.getProperty(KEY_PATH)
-
 	companion object {
 		const val KEY_PORT = "port"
 		const val KEY_LOG_CONFIG = "log.config"
 		const val KEY_DB_URL = "db.url"
 		const val KEY_DB_USERNAME = "db.username"
 		const val KEY_DB_PASSWORD = "db.password"
-		const val KEY_PATH = "path"
 		const val KEY_CONFIRM_SUCCESS_URL = "confirm.success.url"
 		const val KEY_CONFIRM_FAILURE_URL = "confirm.failure.url"
 		const val KEY_UNSUBSCRIBE_FAILURE_URL = "unsubscribe.failure.url"

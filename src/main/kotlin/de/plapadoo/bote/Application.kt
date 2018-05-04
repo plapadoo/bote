@@ -34,8 +34,7 @@ fun main(args: Array<String>) {
 		val config = ApplicationConfiguration(Paths.get(args[0]))
 		val rc = ResourceConfig()
 		initializeLogging(rc, config)
-		val resourceBuilder = Resource.builder(SubscriberEndpoint::class.java).path( config.path)
-		rc.registerResources(resourceBuilder.build())
+		rc.registerClasses(SubscriberEndpoint::class.java)
 
 		DatabaseConnectionFactory.connectToDatabase(config.databaseUrl, config.databaseUsername, config.databasePassword).use { database ->
 			rc.register(object : AbstractBinder() {

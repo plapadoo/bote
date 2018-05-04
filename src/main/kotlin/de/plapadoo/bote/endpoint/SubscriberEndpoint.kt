@@ -10,6 +10,7 @@ import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
 
+@Path("/")
 class SubscriberEndpoint @Inject constructor(val database: Database, private val config: ApplicationConfiguration) {
 
 	val LOG = LoggerFactory.getLogger(SubscriberEndpoint::class.java)!!
