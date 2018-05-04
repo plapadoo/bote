@@ -1,31 +1,16 @@
 package de.plapadoo.bote
 
-import java.io.IOException
+import java.nio.charset.Charset
 import java.nio.file.*
 import java.util.*
 
 class ConfigPropertyNotFoundException(message: String) : RuntimeException(message)
 
-class ApplicationConfiguration
-/**
- * Constructor to load a properties file from the given path.
+class ApplicationConfiguration(path: Path) {
 
- * @param path The path to the properties file.
- * *
- * @throws IOException If the properties file cannot be read.
- */
-constructor(path: Path) {
-	private val properties = Properties().apply {
-		try {
-			Files.newBufferedReader(path).use { r -> this.load(r) }
-		} catch (ignored: NoSuchFileException) {
-			throw RuntimeException("couldn't find configuration file “$path”")
-		}
-	}
+	private var properties: Properties
+	private var confirmationMailText: String
 
-	/**
-	 * @return The port for the server to serve the ReST API on.
-	 */
 	val port: Int
 		get() = this.checkProperty(KEY_PORT).let {
 			it.toIntOrNull() ?: throw RuntimeException("The port “$it” is not valid")
@@ -78,8 +63,30 @@ constructor(path: Path) {
 	val subscribeAlreadySubscribedUrl: String
 		get() = this.properties.getProperty(KEY_SUBSCRIBE_ALREADY_SUBSCRIBED_URL)
 
+	val mailSmtpHost: String
+		get() = this.properties.getProperty(KEY_MAIL_SMTP_HOST)
+
+	val mailSmtpPort: String
+		get() = this.properties.getProperty(KEY_MAIL_SMTP_PORT)
+
+	val mailConfirmationSubject: String
+		get() = this.properties.getProperty(KEY_MAIL_CONFIRMATION_SUBJECT)
+
+	val mailConfirmationFrom: String
+		get() = this.properties.getProperty(KEY_MAIL_CONFIRMATION_FROM)
+
+	val mailConfirmationMimeSubtype: String
+		get() = this.properties.getProperty(KEY_MAIL_CONFIRMATION_MIME_SUBTYPE)
+
+	val confirmationMailTemplate: String
+		get() = confirmationMailText
+
+	val publicUrl: String
+		get() = this.properties.getProperty(KEY_PUBLIC_URL)
+
 	companion object {
 		const val KEY_PORT = "port"
+		const val KEY_PUBLIC_URL = "public.url"
 		const val KEY_LOG_CONFIG = "log.config"
 		const val KEY_DB_URL = "db.url"
 		const val KEY_DB_USERNAME = "db.username"
@@ -91,5 +98,27 @@ constructor(path: Path) {
 		const val KEY_SUBSCRIBE_FAILURE_URL = "subscribe.failure.url"
 		const val KEY_SUBSCRIBE_SUCCESS_URL = "subscribe.success.url"
 		const val KEY_SUBSCRIBE_ALREADY_SUBSCRIBED_URL = "subscribe.already.subscribed.url"
+		const val KEY_MAIL_SMTP_HOST = "mail.smtp.host"
+		const val KEY_MAIL_SMTP_PORT = "mail.smtp.port"
+		const val KEY_MAIL_CONFIRMATION_SUBJECT = "mail.confirmation.subject"
+		const val KEY_MAIL_CONFIRMATION_FROM = "mail.confirmation.from"
+		const val KEY_MAIL_CONFIRMATION_MIME_SUBTYPE = "mail.confirmation.mime.subtype"
+		const val KEY_MAIL_CONFIRMATION_TEMPLATE = "mail.confirmation.template"
+	}
+
+	init {
+		properties = Properties().apply {
+			try {
+				Files.newBufferedReader(path).use { r -> this.load(r) }
+			} catch (ignored: NoSuchFileException) {
+				throw RuntimeException("couldn't find configuration file “$path”")
+			}
+		}
+		val templatePath = Paths.get(properties.getProperty(KEY_MAIL_CONFIRMATION_TEMPLATE))
+		try {
+			confirmationMailText = String(Files.readAllBytes(templatePath), Charset.forName("utf-8"))
+		} catch (ignored: NoSuchFileException) {
+			throw RuntimeException("couldn't find template file “$templatePath”")
+		}
 	}
 }
