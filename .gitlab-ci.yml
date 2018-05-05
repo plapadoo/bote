@@ -6,16 +6,11 @@ compile:
     paths:
       - target/*.jar
 
-run-test:
-  stage: test
-  script:
-    - ci/test.sh
-
 deploy-staging:
   stage: deploy
   environment:
     name: staging
-    url: https://bote.plapadoo.de
+    url: https://newsletter.plapadoo.de
   only:
     - master
   script:
