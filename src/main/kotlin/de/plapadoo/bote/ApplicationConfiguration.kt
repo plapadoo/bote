@@ -43,46 +43,48 @@ class ApplicationConfiguration(path: Path) {
 		get() = this.properties.getProperty(KEY_DB_PASSWORD)
 
 	val confirmSuccessUrl: String
-		get() = this.properties.getProperty(KEY_CONFIRM_SUCCESS_URL)
+		get() = this.checkProperty(KEY_CONFIRM_SUCCESS_URL)
 
 	val confirmFailureUrl: String
-		get() = this.properties.getProperty(KEY_CONFIRM_FAILURE_URL)
+		get() = this.checkProperty(KEY_CONFIRM_FAILURE_URL)
 
 	val unsubscribeSuccessUrl: String
-		get() = this.properties.getProperty(KEY_UNSUBSCRIBE_SUCCESS_URL)
+		get() = this.checkProperty(KEY_UNSUBSCRIBE_SUCCESS_URL)
 
 	val unsubscribeFailureUrl: String
-		get() = this.properties.getProperty(KEY_UNSUBSCRIBE_FAILURE_URL)
+		get() = this.checkProperty(KEY_UNSUBSCRIBE_FAILURE_URL)
 
 	val subscribeSuccessUrl: String
-		get() = this.properties.getProperty(KEY_SUBSCRIBE_SUCCESS_URL)
+		get() = this.checkProperty(KEY_SUBSCRIBE_SUCCESS_URL)
 
 	val subscribeFailureUrl: String
-		get() = this.properties.getProperty(KEY_SUBSCRIBE_FAILURE_URL)
+		get() = this.checkProperty(KEY_SUBSCRIBE_FAILURE_URL)
 
 	val subscribeAlreadySubscribedUrl: String
-		get() = this.properties.getProperty(KEY_SUBSCRIBE_ALREADY_SUBSCRIBED_URL)
+		get() = this.checkProperty(KEY_SUBSCRIBE_ALREADY_SUBSCRIBED_URL)
+
+	val mailSmtpPort: Int
+		get() = this.checkProperty(KEY_MAIL_SMTP_PORT).let {
+			it.toIntOrNull() ?: throw RuntimeException("The smtp port “$it” is not valid")
+		}
 
 	val mailSmtpHost: String
-		get() = this.properties.getProperty(KEY_MAIL_SMTP_HOST)
-
-	val mailSmtpPort: String
-		get() = this.properties.getProperty(KEY_MAIL_SMTP_PORT)
+		get() = this.checkProperty(KEY_MAIL_SMTP_HOST)
 
 	val mailConfirmationSubject: String
-		get() = this.properties.getProperty(KEY_MAIL_CONFIRMATION_SUBJECT)
+		get() = this.checkProperty(KEY_MAIL_CONFIRMATION_SUBJECT)
 
 	val mailConfirmationFrom: String
-		get() = this.properties.getProperty(KEY_MAIL_CONFIRMATION_FROM)
+		get() = this.checkProperty(KEY_MAIL_CONFIRMATION_FROM)
 
 	val mailConfirmationMimeSubtype: String
-		get() = this.properties.getProperty(KEY_MAIL_CONFIRMATION_MIME_SUBTYPE)
+		get() = this.checkProperty(KEY_MAIL_CONFIRMATION_MIME_SUBTYPE)
 
 	val confirmationMailTemplate: String
 		get() = confirmationMailText
 
 	val publicUrl: String
-		get() = this.properties.getProperty(KEY_PUBLIC_URL)
+		get() = this.checkProperty(KEY_PUBLIC_URL)
 
 	companion object {
 		const val KEY_PORT = "port"
@@ -114,11 +116,15 @@ class ApplicationConfiguration(path: Path) {
 				throw RuntimeException("couldn't find configuration file “$path”")
 			}
 		}
-		val templatePath = Paths.get(properties.getProperty(KEY_MAIL_CONFIRMATION_TEMPLATE))
+		val templatePathProperty = this.checkProperty(KEY_MAIL_CONFIRMATION_TEMPLATE)
 		try {
+			val templatePath = Paths.get(templatePathProperty)
+			if (!Files.isReadable(templatePath)) {
+				throw RuntimeException("The template at path “$templatePathProperty” does not exist or is not readable.")
+			}
 			confirmationMailText = String(Files.readAllBytes(templatePath), Charset.forName("utf-8"))
-		} catch (ignored: NoSuchFileException) {
-			throw RuntimeException("couldn't find template file “$templatePath”")
+		} catch (ignored: InvalidPathException) {
+			throw RuntimeException("The template path “$templatePathProperty” is not valid")
 		}
 	}
 }
