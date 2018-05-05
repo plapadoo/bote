@@ -42,8 +42,8 @@ class SubscriberEndpoint @Inject constructor(val database: Database, private val
 
 			}
 			deleteEmail != null -> {
-				LOG.info("Trying to remove subscription for email: $deleteEmail")
-				return database.deleteSubscriber(deleteEmail)
+				LOG.info("Trying to remove subscription for email: ${deleteEmail.toLowerCase()}")
+				return database.deleteSubscriber(deleteEmail.toLowerCase())
 						.toSingle { Response.temporaryRedirect(URI.create(config.unsubscribeSuccessUrl)).build() }
 						.onErrorReturn { Response.temporaryRedirect(URI.create(config.unsubscribeFailureUrl)).build() }
 						.blockingGet()
@@ -56,16 +56,16 @@ class SubscriberEndpoint @Inject constructor(val database: Database, private val
 	@POST
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	fun post(@FormParam("email") email: String): Response {
-		return database.createSubscriber(email).map {
-			MailUtil.validate(email)
+		MailUtil.validate(email.toLowerCase())
+		return database.createSubscriber(email.toLowerCase()).map {
 			when {
 				it.isNotBlank() -> {
-					LOG.info("New subscriber: $email token: $it")
+					LOG.info("New subscriber: ${email.toLowerCase()} token: $it")
 					MailUtil.sendConfirmationLink(email, it, config)
 					Response.temporaryRedirect(URI.create(config.subscribeSuccessUrl)).build()
 				}
 				else -> {
-					LOG.info("Subscriber already in database: $email")
+					LOG.info("Subscriber already in database: ${email.toLowerCase()}")
 					Response.temporaryRedirect(URI.create(config.subscribeAlreadySubscribedUrl)).build()
 				}
 			}

@@ -36,12 +36,18 @@ import java.util.*
 class JOOQDatabase(url: String, userName: String?, password: String?) : Database {
 	private val connection: Connection
 
-	override fun createSubscriber(email: String): Single<String?> {
+	override fun createSubscriber(email: String): Single<String> {
 		return Single.fromCallable {
-			val subscriber = context().newRecord(SUBSCRIBER)
-			subscriber.email = email
-			subscriber.token = UUID.randomUUID().toString()
-			if (subscriber.store() == 1) subscriber.token else null
+			val existing = context().select(SUBSCRIBER.TOKEN).from(SUBSCRIBER).where(SUBSCRIBER.EMAIL.eq(email)).fetchOne()
+			if (existing == null) {
+				val subscriber = context().newRecord(SUBSCRIBER)
+				subscriber.email = email
+				subscriber.token = UUID.randomUUID().toString()
+				subscriber.store()
+				subscriber.token
+			} else {
+				existing.getValue(SUBSCRIBER.TOKEN) ?: ""
+			}
 		}
 	}
 
