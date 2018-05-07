@@ -87,6 +87,18 @@ class ApplicationConfiguration(path: Path) {
 	val mailSmtpHost: String
 		get() = this.checkProperty(KEY_MAIL_SMTP_HOST)
 
+	val mailSmtpAuth: String
+		get() = this.checkProperty(KEY_MAIL_SMTP_AUTH)
+
+	val mailSmtpStartTls: String
+		get() = this.checkProperty(KEY_MAIL_SMTP_STARTTLS)
+
+	val mailUsername: String
+		get() = this.checkProperty(KEY_MAIL_USERNAME)
+
+	val mailPassword: String
+		get() = this.checkProperty(KEY_MAIL_PASSWORD)
+
 	val mailConfirmationSubject: String
 		get() = this.checkProperty(KEY_MAIL_CONFIRMATION_SUBJECT)
 
@@ -118,6 +130,10 @@ class ApplicationConfiguration(path: Path) {
 		const val KEY_SUBSCRIBE_ALREADY_SUBSCRIBED_URL = "subscribe.already.subscribed.url"
 		const val KEY_MAIL_SMTP_HOST = "mail.smtp.host"
 		const val KEY_MAIL_SMTP_PORT = "mail.smtp.port"
+		const val KEY_MAIL_SMTP_AUTH = "mail.smtp.auth"
+		const val KEY_MAIL_SMTP_STARTTLS = "mail.smtp.starttls"
+		const val KEY_MAIL_USERNAME = "mail.user"
+		const val KEY_MAIL_PASSWORD = "mail.password"
 		const val KEY_MAIL_CONFIRMATION_SUBJECT = "mail.confirmation.subject"
 		const val KEY_MAIL_CONFIRMATION_FROM = "mail.confirmation.from"
 		const val KEY_MAIL_CONFIRMATION_MIME_SUBTYPE = "mail.confirmation.mime.subtype"

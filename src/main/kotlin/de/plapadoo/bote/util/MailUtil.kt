@@ -37,7 +37,14 @@ class MailUtil {
 			val props = Properties()
 			props.put("mail.smtp.host", config.mailSmtpHost)
 			props.put("mail.smtp.port", config.mailSmtpPort)
-			val session = Session.getInstance(props, null)
+			props.put("mail.smtp.auth", config.mailSmtpAuth)
+			props.put("mail.smtp.starttls.enable", config.mailSmtpStartTls);
+			val auth = object : Authenticator() {
+				override fun getPasswordAuthentication(): PasswordAuthentication {
+					return PasswordAuthentication(config.mailUsername, config.mailPassword)
+				}
+			}
+			val session = Session.getInstance(props, auth)
 
 			try {
 				val msg = MimeMessage(session)
