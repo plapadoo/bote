@@ -55,7 +55,8 @@ data class Language(
 		val subscribeFailureUrl: URI,
 		val mailConfirmationSubject: String,
 		val mailConfirmationFrom: String,
-		val mailConfirmationTemplate: Path
+		val mailConfirmationTemplate: Path,
+		val unsubscribeTemplate: Path
 )
 
 class ApplicationConfiguration(path: Path) {
@@ -147,6 +148,10 @@ class ApplicationConfiguration(path: Path) {
 		return this.confirmationMailTexts[language]
 	}
 
+	fun unsubscribeTemplate(language: String): Path? {
+		return this.config.languages.find { l -> l.language == language }?.unsubscribeTemplate
+	}
+
 	val publicUrl: URI
 		get() = this.config.publicUrl
 
@@ -173,6 +178,11 @@ class ApplicationConfiguration(path: Path) {
 				throw RuntimeException("The template path “$templatePath” is not valid")
 			}
 		}))
+		this.config.languages.stream().forEach({
+			if (!it.unsubscribeTemplate.toFile().exists()) {
+				throw RuntimeException("The template path “${it.unsubscribeTemplate}” is not valid")
+			}
+		})
 	}
 }
 

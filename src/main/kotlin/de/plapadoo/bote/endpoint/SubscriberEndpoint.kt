@@ -48,7 +48,7 @@ class SubscriberEndpoint @Inject constructor(val database: Database, private val
 						.blockingGet()
 
 			}
-			else -> return Response.status(Response.Status.BAD_REQUEST).build()
+			else -> return Response.ok(config.unsubscribeTemplate(language)?.toFile(), "text/html").build()
 		}
 	}
 

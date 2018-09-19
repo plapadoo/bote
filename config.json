@@ -15,7 +15,8 @@
 	  "subscribeFailureUrl": "https://myproduct.com?msg=subscribe-failure",
 	  "mailConfirmationSubject": "[myproduct] Please confirm your newsletter subscription",
 	  "mailConfirmationFrom": "newsletter@myproduct.com",
-	  "mailConfirmationTemplate": "./template-confirmation.en.html"
+	  "mailConfirmationTemplate": "./template-confirmation.en.html",
+	  "unsubscribeTemplate": "./template-unsubscribe.en.html"
 	},
 	{
 	  "language": "de",
@@ -28,7 +29,8 @@
 	  "subscribeFailureUrl": "https://myproduct.de?msg=subscribe-failure",
 	  "mailConfirmationSubject": "[myproduct] Bitte bestätigen Sie Ihre Newsletter-Anmeldung",
 	  "mailConfirmationFrom": "newsletter@myproduct.de",
-	  "mailConfirmationTemplate": "./template-confirmation.de.html"
+	  "mailConfirmationTemplate": "./template-confirmation.de.html",
+	  "unsubscribeTemplate": "./template-unsubscribe.de.html"
 	}
   ],
   "mailSmtpHost": "smtp.myproduct.com",
