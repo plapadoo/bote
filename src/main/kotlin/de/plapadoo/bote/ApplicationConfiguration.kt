@@ -16,147 +16,187 @@
  */
 package de.plapadoo.bote
 
+import com.squareup.moshi.FromJson
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.ToJson
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import okio.Okio
+import java.net.URI
 import java.nio.charset.Charset
 import java.nio.file.*
-import java.util.*
+import java.util.stream.Collectors
 
-class ConfigPropertyNotFoundException(message: String) : RuntimeException(message)
+
+data class Configuration(
+		val port: Int = 8081,
+		val publicUrl: URI,
+		val logConfig: Path = Paths.get("logback-config.xml"),
+		val dbUrl: URI,
+		val dbUsername: String?,
+		val dbPassword: String?,
+		val languages: List<Language>,
+		val mailSmtpHost: String,
+		val mailSmtpPort: Int = 587,
+		val mailSmtpAuth: Boolean = true,
+		val mailSmtpStarttls: Boolean = true,
+		val mailUser: String,
+		val mailPassword: String,
+		val mailConfirmationMimeSubtype: String = "html"
+)
+
+data class Language(
+		val language: String,
+		val confirmSuccessUrl: URI,
+		val confirmFailureUrl: URI,
+		val unsubscribeSuccessUrl: URI,
+		val unsubscribeFailureUrl: URI,
+		val subscribeSuccessUrl: URI,
+		val subscribeAlreadySubscribedUrl: URI,
+		val subscribeFailureUrl: URI,
+		val mailConfirmationSubject: String,
+		val mailConfirmationFrom: String,
+		val mailConfirmationTemplate: Path
+)
 
 class ApplicationConfiguration(path: Path) {
-
-	private var properties: Properties
-	private var confirmationMailText: String
+	private val confirmationMailTexts: Map<String, String>
+	private val config: Configuration
 
 	val port: Int
-		get() = this.checkProperty(KEY_PORT).let {
-			it.toIntOrNull() ?: throw RuntimeException("The port “$it” is not valid")
-		}
+		get() = this.config.port
 
 	val logConfigPath: Path
 		get() {
-			val property = this.checkProperty(KEY_LOG_CONFIG)
+			val path = this.config.logConfig
 			try {
-				val path = Paths.get(property)
 				return if (!Files.isReadable(path)) {
-					throw RuntimeException("The log config at path “$property” does not exist or is not readable.")
+					throw RuntimeException("The log config at path “$path” does not exist or is not readable.")
 				} else path
 			} catch (ignored: InvalidPathException) {
-				throw RuntimeException("The log config path “$property” is not valid")
+				throw RuntimeException("The log config path “$path” is not valid")
 			}
-
 		}
 
-	private fun checkProperty(propertyKey: String) = this.properties.getProperty(propertyKey) ?: throw ConfigPropertyNotFoundException(
-			"Configuration is missing property: “$propertyKey”")
-
-	val databaseUrl: String
-		get() = this.checkProperty(KEY_DB_URL)
+	val databaseUrl: URI
+		get() = this.config.dbUrl
 
 	val databaseUsername: String?
-		get() = this.properties.getProperty(KEY_DB_USERNAME)
+		get() = this.config.dbUsername
 
 	val databasePassword: String?
-		get() = this.properties.getProperty(KEY_DB_PASSWORD)
+		get() = this.config.dbPassword
 
-	val confirmSuccessUrl: String
-		get() = this.checkProperty(KEY_CONFIRM_SUCCESS_URL)
-
-	val confirmFailureUrl: String
-		get() = this.checkProperty(KEY_CONFIRM_FAILURE_URL)
-
-	val unsubscribeSuccessUrl: String
-		get() = this.checkProperty(KEY_UNSUBSCRIBE_SUCCESS_URL)
-
-	val unsubscribeFailureUrl: String
-		get() = this.checkProperty(KEY_UNSUBSCRIBE_FAILURE_URL)
-
-	val subscribeSuccessUrl: String
-		get() = this.checkProperty(KEY_SUBSCRIBE_SUCCESS_URL)
-
-	val subscribeFailureUrl: String
-		get() = this.checkProperty(KEY_SUBSCRIBE_FAILURE_URL)
-
-	val subscribeAlreadySubscribedUrl: String
-		get() = this.checkProperty(KEY_SUBSCRIBE_ALREADY_SUBSCRIBED_URL)
-
-	val mailSmtpPort: Int
-		get() = this.checkProperty(KEY_MAIL_SMTP_PORT).let {
-			it.toIntOrNull() ?: throw RuntimeException("The smtp port “$it” is not valid")
-		}
-
-	val mailSmtpHost: String
-		get() = this.checkProperty(KEY_MAIL_SMTP_HOST)
-
-	val mailSmtpAuth: String
-		get() = this.checkProperty(KEY_MAIL_SMTP_AUTH)
-
-	val mailSmtpStartTls: String
-		get() = this.checkProperty(KEY_MAIL_SMTP_STARTTLS)
-
-	val mailUsername: String
-		get() = this.checkProperty(KEY_MAIL_USERNAME)
-
-	val mailPassword: String
-		get() = this.checkProperty(KEY_MAIL_PASSWORD)
-
-	val mailConfirmationSubject: String
-		get() = this.checkProperty(KEY_MAIL_CONFIRMATION_SUBJECT)
-
-	val mailConfirmationFrom: String
-		get() = this.checkProperty(KEY_MAIL_CONFIRMATION_FROM)
-
-	val mailConfirmationMimeSubtype: String
-		get() = this.checkProperty(KEY_MAIL_CONFIRMATION_MIME_SUBTYPE)
-
-	val confirmationMailTemplate: String
-		get() = confirmationMailText
-
-	val publicUrl: String
-		get() = this.checkProperty(KEY_PUBLIC_URL)
-
-	companion object {
-		const val KEY_PORT = "port"
-		const val KEY_PUBLIC_URL = "public.url"
-		const val KEY_LOG_CONFIG = "log.config"
-		const val KEY_DB_URL = "db.url"
-		const val KEY_DB_USERNAME = "db.username"
-		const val KEY_DB_PASSWORD = "db.password"
-		const val KEY_CONFIRM_SUCCESS_URL = "confirm.success.url"
-		const val KEY_CONFIRM_FAILURE_URL = "confirm.failure.url"
-		const val KEY_UNSUBSCRIBE_FAILURE_URL = "unsubscribe.failure.url"
-		const val KEY_UNSUBSCRIBE_SUCCESS_URL = "unsubscribe.success.url"
-		const val KEY_SUBSCRIBE_FAILURE_URL = "subscribe.failure.url"
-		const val KEY_SUBSCRIBE_SUCCESS_URL = "subscribe.success.url"
-		const val KEY_SUBSCRIBE_ALREADY_SUBSCRIBED_URL = "subscribe.already.subscribed.url"
-		const val KEY_MAIL_SMTP_HOST = "mail.smtp.host"
-		const val KEY_MAIL_SMTP_PORT = "mail.smtp.port"
-		const val KEY_MAIL_SMTP_AUTH = "mail.smtp.auth"
-		const val KEY_MAIL_SMTP_STARTTLS = "mail.smtp.starttls"
-		const val KEY_MAIL_USERNAME = "mail.user"
-		const val KEY_MAIL_PASSWORD = "mail.password"
-		const val KEY_MAIL_CONFIRMATION_SUBJECT = "mail.confirmation.subject"
-		const val KEY_MAIL_CONFIRMATION_FROM = "mail.confirmation.from"
-		const val KEY_MAIL_CONFIRMATION_MIME_SUBTYPE = "mail.confirmation.mime.subtype"
-		const val KEY_MAIL_CONFIRMATION_TEMPLATE = "mail.confirmation.template"
+	fun confirmSuccessUrl(language: String): URI? {
+		return this.config.languages.find { l -> l.language == language }?.confirmSuccessUrl
 	}
 
+	fun confirmFailureUrl(language: String): URI? {
+		return this.config.languages.find { l -> l.language == language }?.confirmFailureUrl
+	}
+
+	fun unsubscribeSuccessUrl(language: String): URI? {
+		return this.config.languages.find { l -> l.language == language }?.unsubscribeSuccessUrl
+	}
+
+	fun unsubscribeFailureUrl(language: String): URI? {
+		return this.config.languages.find { l -> l.language == language }?.unsubscribeFailureUrl
+	}
+
+	fun subscribeSuccessUrl(language: String): URI? {
+		return this.config.languages.find { l -> l.language == language }?.subscribeSuccessUrl
+	}
+
+	fun subscribeFailureUrl(language: String): URI? {
+		return this.config.languages.find { l -> l.language == language }?.subscribeFailureUrl
+	}
+
+	fun subscribeAlreadySubscribedUrl(language: String): URI? {
+		return this.config.languages.find { l -> l.language == language }?.subscribeAlreadySubscribedUrl
+	}
+
+	val mailSmtpPort: Int
+		get() = this.config.mailSmtpPort
+
+	val mailSmtpHost: String
+		get() = this.config.mailSmtpHost
+
+	val mailSmtpAuth: Boolean
+		get() = this.config.mailSmtpAuth
+
+	val mailSmtpStarttls: Boolean
+		get() = this.config.mailSmtpStarttls
+
+	val mailUsername: String
+		get() = this.config.mailUser
+
+	val mailPassword: String
+		get() = this.config.mailPassword
+
+	fun mailConfirmationSubject(language: String): String? {
+		return this.config.languages.find { l -> l.language == language }?.mailConfirmationSubject
+	}
+
+	fun mailConfirmationFrom(language: String): String? {
+		return this.config.languages.find { l -> l.language == language }?.mailConfirmationFrom
+	}
+
+	val mailConfirmationMimeSubtype: String
+		get() = this.config.mailConfirmationMimeSubtype
+
+	fun confirmationMailTemplate(language: String): String? {
+		return this.confirmationMailTexts[language]
+	}
+
+	val publicUrl: URI
+		get() = this.config.publicUrl
+
 	init {
-		properties = Properties().apply {
-			try {
-				Files.newBufferedReader(path).use { r -> this.load(r) }
-			} catch (ignored: NoSuchFileException) {
-				throw RuntimeException("couldn't find configuration file “$path”")
-			}
-		}
-		val templatePathProperty = this.checkProperty(KEY_MAIL_CONFIRMATION_TEMPLATE)
+		val moshi = Moshi.Builder()
+				.add(KotlinJsonAdapterFactory())
+				.add(PathAdapter())
+				.add(URIAdapter())
+				.build()
 		try {
-			val templatePath = Paths.get(templatePathProperty)
-			if (!Files.isReadable(templatePath)) {
-				throw RuntimeException("The template at path “$templatePathProperty” does not exist or is not readable.")
-			}
-			confirmationMailText = String(Files.readAllBytes(templatePath), Charset.forName("utf-8"))
-		} catch (ignored: InvalidPathException) {
-			throw RuntimeException("The template path “$templatePathProperty” is not valid")
+			config = moshi.adapter(Configuration::class.java).fromJson(Okio.buffer(Okio.source(path)))!!
+		} catch (ignored: NoSuchFileException) {
+			throw RuntimeException("couldn't find configuration file “$path”")
 		}
+
+		this.confirmationMailTexts = this.config.languages.stream().collect(Collectors.toMap({ it.language }, {
+			val templatePath = it.mailConfirmationTemplate
+			try {
+				if (!Files.isReadable(templatePath)) {
+					throw RuntimeException("The template at path “$templatePath” does not exist or is not readable.")
+				}
+				String(Files.readAllBytes(templatePath), Charset.forName("utf-8"))
+			} catch (ignored: InvalidPathException) {
+				throw RuntimeException("The template path “$templatePath” is not valid")
+			}
+		}))
+	}
+}
+
+
+class PathAdapter {
+	@ToJson
+	fun toJson(path: Path): String {
+		return path.toString()
+	}
+
+	@FromJson
+	fun fromJson(path: String): Path {
+		return Paths.get(path)
+	}
+}
+
+class URIAdapter {
+	@ToJson
+	fun toJson(uri: URI): String {
+		return uri.toString()
+	}
+
+	@FromJson
+	fun fromJson(uri: String): URI {
+		return URI(uri)
 	}
 }

@@ -25,7 +25,7 @@ interface Database : AutoCloseable {
 		const val DB_DATE_PATTERN = "yyyy-MM-dd HH:mm:ss"
 	}
 
-	fun createSubscriber(email: String): Single<String>
+	fun createSubscriber(email: String, language: String): Single<String>
 
 	fun deleteSubscriber(email: String): Completable
 

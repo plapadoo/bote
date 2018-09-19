@@ -26,7 +26,6 @@ import org.glassfish.jersey.server.ResourceConfig
 import org.slf4j.LoggerFactory
 import org.slf4j.bridge.SLF4JBridgeHandler
 import org.glassfish.hk2.utilities.binding.AbstractBinder
-import org.glassfish.jersey.server.model.Resource
 import java.net.URI
 import java.nio.file.Paths
 import java.util.concurrent.TimeUnit
@@ -44,10 +43,11 @@ fun main(args: Array<String>) {
 	val logger = LoggerFactory.getLogger("de.plapadoo.bote.Application")
 	try {
 		if (args.isEmpty()) {
-			throw RuntimeException("Please provide the path/to/the/application.properties as the first program argument.")
+			throw RuntimeException("Please provide the path/to/the/config.json as the first program argument.")
 		}
 
 		val config = ApplicationConfiguration(Paths.get(args[0]))
+
 		val rc = ResourceConfig()
 		initializeLogging(rc, config)
 		rc.registerClasses(SubscriberEndpoint::class.java)
@@ -72,14 +72,14 @@ fun main(args: Array<String>) {
 					.subscribeOn(Schedulers.io())
 					.delay(1, TimeUnit.HOURS)
 					.repeat()
-					.subscribe{logger.info("Removing unconfirmed subscribers older than 24 hours")}
+					.subscribe { logger.info("Removing unconfirmed subscribers older than 24 hours") }
 
 			grizzlyServer.start()
 			while (grizzlyServer.isStarted) Thread.sleep(1000)
 		}
 
 
-	} catch (e: ConfigPropertyNotFoundException) {
+	} catch (e: RuntimeException) {  // TODO: JSON schema validation
 		logger.error(e.message)
 		System.exit(1)
 	} catch (e: Exception) {

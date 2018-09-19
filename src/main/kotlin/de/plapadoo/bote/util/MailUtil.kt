@@ -19,7 +19,6 @@ package de.plapadoo.bote.util
 import de.plapadoo.bote.ApplicationConfiguration
 import org.slf4j.LoggerFactory
 import java.util.*
-import java.util.regex.Pattern
 import javax.mail.*
 import javax.mail.internet.InternetAddress
 import javax.mail.internet.MimeMessage
@@ -33,12 +32,12 @@ class MailUtil {
 			InternetAddress(email).validate()
 		}
 
-		fun sendConfirmationLink(subscriber: String, token: String, config: ApplicationConfiguration) {
+		fun sendConfirmationLink(subscriber: String, token: String, config: ApplicationConfiguration, language: String) {
 			val props = Properties()
 			props.put("mail.smtp.host", config.mailSmtpHost)
 			props.put("mail.smtp.port", config.mailSmtpPort)
 			props.put("mail.smtp.auth", config.mailSmtpAuth)
-			props.put("mail.smtp.starttls.enable", config.mailSmtpStartTls);
+			props.put("mail.smtp.starttls.enable", config.mailSmtpStarttls);
 			val auth = object : Authenticator() {
 				override fun getPasswordAuthentication(): PasswordAuthentication {
 					return PasswordAuthentication(config.mailUsername, config.mailPassword)
@@ -48,13 +47,13 @@ class MailUtil {
 
 			try {
 				val msg = MimeMessage(session)
-				msg.setFrom(InternetAddress(config.mailConfirmationFrom))
+				msg.setFrom(InternetAddress(config.mailConfirmationFrom(language)))
 				msg.setRecipients(Message.RecipientType.TO, subscriber)
-				msg.setSubject(config.mailConfirmationSubject)
+				msg.setSubject(config.mailConfirmationSubject(language))
 				msg.setSentDate(Date())
-				val confirmationUrl = config.publicUrl + "?confirm=$token"
+				val confirmationUrl = config.publicUrl.toString() + "?language=$language&confirm=$token"
 				msg.setText(
-						config.confirmationMailTemplate.replace(URL_VARIABLE, confirmationUrl),
+						config.confirmationMailTemplate(language)?.replace(URL_VARIABLE, confirmationUrl),
 						"utf-8",
 						config.mailConfirmationMimeSubtype
 				)

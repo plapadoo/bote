@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+	http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+
+	<changeSet id="add-language" author="Kim">
+		<!-- https://liquibase.jira.com/browse/CORE-2468 -->
+		<sql>
+            ALTER TABLE subscriber ADD COLUMN language varchar(2)
+        </sql>
+		<sql>
+			UPDATE subscriber SET language="en"
+		</sql>
+	</changeSet>
+
+
+</databaseChangeLog>

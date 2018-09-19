@@ -1,7 +1,7 @@
 FROM openjdk:alpine
 ENV LIQUIBASE_URL=https://github.com/liquibase/liquibase/releases/download/liquibase-parent-3.5.3/liquibase-3.5.3-bin.tar.gz \
     SQLITE_DRIVER_URL=http://central.maven.org/maven2/org/xerial/sqlite-jdbc/3.21.0.1/sqlite-jdbc-3.21.0.1.jar \
-    START_SCRIPT="java -version && java -jar /opt/liquibase/liquibase.jar --classpath=/opt/liquibase/lib/sqlitedriver.jar --driver=org.sqlite.JDBC --url=jdbc:sqlite:file:/var/lib/bote/bote.sqlite --changeLogFile=/opt/bote/database/changelog-master.xml update && java -jar bote.jar /etc/bote/application.properties"
+    START_SCRIPT="java -version && java -jar /opt/liquibase/liquibase.jar --classpath=/opt/liquibase/lib/sqlitedriver.jar --driver=org.sqlite.JDBC --url=jdbc:sqlite:file:/var/lib/bote/bote.sqlite --changeLogFile=/opt/bote/database/changelog-master.xml update && java -jar bote.jar /etc/bote/config.json"
 
 # Install liquibase with sqlite driver
 RUN mkdir -p /opt/liquibase && \

@@ -20,7 +20,6 @@ import de.plapadoo.bote.ApplicationConfiguration
 import de.plapadoo.bote.database.api.Database
 import de.plapadoo.bote.util.MailUtil
 import org.slf4j.LoggerFactory
-import java.net.URI
 import javax.inject.Inject
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
@@ -32,20 +31,20 @@ class SubscriberEndpoint @Inject constructor(val database: Database, private val
 	private val LOG = LoggerFactory.getLogger(SubscriberEndpoint::class.java)!!
 
 	@GET
-	fun get(@QueryParam("confirm") token: String?, @QueryParam("unsubscribe") deleteEmail: String?): Response {
+	fun get(@QueryParam("language") language: String, @QueryParam("confirm") token: String?, @QueryParam("unsubscribe") deleteEmail: String?): Response {
 		when {
 			token != null -> {
 				LOG.info("Tryring to activate subscription with token: $token")
 				return database.confirmSubscriber(token)
-						.map { Response.temporaryRedirect(URI.create(if (it) config.confirmSuccessUrl else config.confirmFailureUrl)).build() }
+						.map { Response.temporaryRedirect(if (it) config.confirmSuccessUrl(language) else config.confirmFailureUrl(language)).build() }
 						.blockingGet()
 
 			}
 			deleteEmail != null -> {
 				LOG.info("Trying to remove subscription for email: ${deleteEmail.toLowerCase()}")
 				return database.deleteSubscriber(deleteEmail.toLowerCase())
-						.toSingle { Response.temporaryRedirect(URI.create(config.unsubscribeSuccessUrl)).build() }
-						.onErrorReturn { Response.temporaryRedirect(URI.create(config.unsubscribeFailureUrl)).build() }
+						.toSingle { Response.temporaryRedirect(config.unsubscribeSuccessUrl(language)).build() }
+						.onErrorReturn { Response.temporaryRedirect(config.unsubscribeFailureUrl(language)).build() }
 						.blockingGet()
 
 			}
@@ -55,23 +54,23 @@ class SubscriberEndpoint @Inject constructor(val database: Database, private val
 
 	@POST
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	fun post(@FormParam("email") email: String): Response {
+	fun post(@FormParam("language") language: String, @FormParam("email") email: String): Response {
 		MailUtil.validate(email.toLowerCase())
-		return database.createSubscriber(email.toLowerCase()).map {
+		return database.createSubscriber(email.toLowerCase(), language.toLowerCase()).map {
 			when {
 				it.isNotBlank() -> {
 					LOG.info("New subscriber: ${email.toLowerCase()} token: $it")
-					MailUtil.sendConfirmationLink(email, it, config)
-					Response.temporaryRedirect(URI.create(config.subscribeSuccessUrl)).build()
+					MailUtil.sendConfirmationLink(email, it, config, language)
+					Response.temporaryRedirect(config.subscribeSuccessUrl(language)).build()
 				}
 				else -> {
 					LOG.info("Subscriber already in database: ${email.toLowerCase()}")
-					Response.temporaryRedirect(URI.create(config.subscribeAlreadySubscribedUrl)).build()
+					Response.temporaryRedirect(config.subscribeAlreadySubscribedUrl(language)).build()
 				}
 			}
 		}
-		.onErrorReturn { Response.temporaryRedirect(URI.create(config.subscribeFailureUrl)).build() }
-		.blockingGet()
+				.onErrorReturn { Response.temporaryRedirect(config.subscribeFailureUrl(language)).build() }
+				.blockingGet()
 	}
 
 }

@@ -1,0 +1,41 @@
+{
+  "port": 8081,
+  "publicUrl": "https://newsletter.myproduct.com",
+  "logConfig": "./logback-config.xml",
+  "dbUrl": "jdbc:sqlite:file:./generated/myproduct-bote.sqlite",
+  "languages": [
+	{
+	  "language": "en",
+	  "confirmSuccessUrl": "https://myproduct.com?msg=confirm-success",
+	  "confirmFailureUrl": "https://myproduct.com?msg=confirm-failure",
+	  "unsubscribeSuccessUrl": "https://myproduct.com?msg=unsubscribe-success",
+	  "unsubscribeFailureUrl": "https://myproduct.com?msg=unsubscribe-failure",
+	  "subscribeSuccessUrl": "https://myproduct.com?msg=subscribe-success",
+	  "subscribeAlreadySubscribedUrl": "https://myproduct.com?msg=subscribe-already-subscribed",
+	  "subscribeFailureUrl": "https://myproduct.com?msg=subscribe-failure",
+	  "mailConfirmationSubject": "[myproduct] Please confirm your newsletter subscription",
+	  "mailConfirmationFrom": "newsletter@myproduct.com",
+	  "mailConfirmationTemplate": "./template-confirmation.en.html"
+	},
+	{
+	  "language": "de",
+	  "confirmSuccessUrl": "https://myproduct.de?msg=confirm-success",
+	  "confirmFailureUrl": "https://myproduct.de?msg=confirm-failure",
+	  "unsubscribeSuccessUrl": "https://myproduct.de?msg=unsubscribe-success",
+	  "unsubscribeFailureUrl": "https://myproduct.de?msg=unsubscribe-failure",
+	  "subscribeSuccessUrl": "https://myproduct.de?msg=subscribe-success",
+	  "subscribeAlreadySubscribedUrl": "https://myproduct.de?msg=subscribe-already-subscribed",
+	  "subscribeFailureUrl": "https://myproduct.de?msg=subscribe-failure",
+	  "mailConfirmationSubject": "[myproduct] Bitte bestätigen Sie Ihre Newsletter-Anmeldung",
+	  "mailConfirmationFrom": "newsletter@myproduct.de",
+	  "mailConfirmationTemplate": "./template-confirmation.de.html"
+	}
+  ],
+  "mailSmtpHost": "smtp.myproduct.com",
+  "mailSmtpPort": "587",
+  "mailSmtpAuth": true,
+  "mailSmtpStarttls": true,
+  "mailUser": "mailuser",
+  "mailPassword": "mailuserpassword",
+  "mailConfirmationMime.subtype": "html"
+}
